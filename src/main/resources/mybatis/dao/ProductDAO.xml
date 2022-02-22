@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dev.market.product.model.dao.ProductDAO">
+    <select id="selectProductInfoList"
+            resultType="com.dev.market.product.model.vo.ProductInfoVO">
+        /* 상품 리스트 조회 */
+        SELECT TB_P.PD_NO     AS pdNo
+             , TB_P_D.TITLE   AS pdTitle
+             , TB_P_D.CONTENT AS pdContent
+             , TB_P_D.PRICE   AS pdPrice
+             , TB_P.OPEN_YN   AS openYNEnum
+             , TB_P.REG_DT    AS regDt
+        FROM market.TB_PD AS TB_P
+
+                 INNER JOIN market.TB_PD_DETAIL AS TB_P_D
+                            ON TB_P.PD_NO = TB_P_D.PD_NO
+
+        WHERE TB_P.OPEN_YN = 'Y'
+    </select>
+
+    <select id="selectProductInfo"
+            parameterType="com.dev.market.product.model.dto.ProductSelectRequestDTO"
+            resultType="com.dev.market.product.model.vo.ProductDetailInfoVO">
+        /* 상품 상세 조회 */
+        SELECT TB_P.PD_NO         AS pdNo
+             , TB_P_D.TITLE       AS pdTitle
+             , TB_P_D.CONTENT     AS pdContent
+             , TB_P_D.PRICE       AS pdPrice
+             , TB_P_C_S.PD_CT1_NO AS pdCt1No
+             , TB_P_CT1.NAME      AS pdCt1Name
+             , TB_P_C_S.PD_CT2_NO AS pdCt2No
+             , TB_P_CT2.NAME      AS pdCt2Name
+             , TB_P.OPEN_YN       AS openYNEnum
+             , TB_P.REG_DT        AS regDt
+        FROM market.TB_PD AS TB_P
+
+                 INNER JOIN market.TB_PD_DETAIL AS TB_P_D
+                            ON TB_P.PD_NO = TB_P_D.PD_NO
+
+                 INNER JOIN market.TB_PD_CT_SELECT AS TB_P_C_S
+                            ON TB_P.PD_NO = TB_P_C_S.PD_NO
+
+                 INNER JOIN market.TB_PD_CT_DEPTH1 AS TB_P_CT1
+                            ON TB_P_C_S.PD_CT1_NO = TB_P_CT1.PD_CT1_NO
+
+                 INNER JOIN market.TB_PD_CT_DEPTH2 AS TB_P_CT2
+                            ON TB_P_C_S.PD_CT2_NO = TB_P_CT2.PD_CT2_NO
+
+        WHERE TB_P.OPEN_YN = 'Y'
+          AND TB_P_CT1.USE_YN = 'Y'
+          AND TB_P_CT2.USE_YN = 'Y'
+          AND TB_P.PD_NO = #{pdNo}
+    </select>
+
+    <insert id="insertProductViewCnt"
+            parameterType="com.dev.market.product.model.dto.ProductViewInsertRequestDTO">
+        /* 상품 조회수 삽입 */
+        INSERT INTO market.TB_PD_VIEW(PD_NO)
+            VALUE (#{pdNo})
+    </insert>
+
+    <insert id="insertProductInfo"
+            parameterType="com.dev.market.product.model.dto.ProductInsertRequestDTO">
+        /* 상품 삽입 */
+        INSERT INTO market.TB_PD(OPEN_YN)
+        VALUE (#{openYNEnum})
+
+        <selectKey resultType="Long"
+                   keyProperty="pdNo"
+                   order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <insert id="insertProductDetailInfo"
+            parameterType="com.dev.market.product.model.dto.ProductInsertRequestDTO">
+        /* 상품 상세 삽입 */
+        INSERT INTO market.TB_PD_DETAIL(PD_NO, TITLE, CONTENT, PRICE)
+            VALUE (#{pdNo}, #{pdTitle}, #{pdContent}, #{pdPrice})
+    </insert>
+
+    <insert id="insertProductCategorySelectInfo"
+            parameterType="com.dev.market.product.model.dto.ProductInsertRequestDTO">
+        /* 상품 카테고리 삽입 */
+        INSERT INTO market.TB_PD_CT_SELECT(PD_NO, PD_CT1_NO, PD_CT2_NO)
+            VALUE (#{pdNo}, #{pdCt1No}, #{pdCt2No})
+    </insert>
+
+    <update id="updateProductInfo"
+            parameterType="com.dev.market.product.model.dto.ProductUpdateRequestDTO">
+        /* 상품 업데이트 */
+        UPDATE market.TB_PD_DETAIL
+        SET TITLE   = #{pdTitle}
+          , CONTENT = #{pdContent}
+          , PRICE   = #{pdPrice}
+          , MOD_DT  = NOW()
+        WHERE PD_NO = #{pdNo}
+    </update>
+
+    <update id="updateProductCategoryInfo"
+            parameterType="com.dev.market.product.model.dto.ProductUpdateRequestDTO">
+        /* 상품 카테고리 업데이트 */
+        UPDATE market.TB_PD_CT_SELECT
+        SET PD_CT1_NO = #{pdCt1No}
+          , PD_CT2_NO = #{pdCt2No}
+        WHERE PD_NO = #{pdNo}
+    </update>
+
+    <update id="updateProductState"
+            parameterType="com.dev.market.product.model.dto.ProductUpdateStateRequestDTO">
+        /* 상품 상태 업데이트 */
+        UPDATE market.TB_PD
+        SET OPEN_YN = #{openYNEnum}
+          , MOD_DT  = NOW()
+        WHERE PD_NO = #{pdNo}
+    </update>
+
+    <delete id="deleteProductInfo"
+            parameterType="com.dev.market.product.model.dto.ProductDeleteRequestDTO">
+        /* 상품 삭제 */
+        DELETE
+        FROM market.TB_PD
+        WHERE PD_NO = #{pdNo}
+    </delete>
+
+    <delete id="deleteProductDetailInfo"
+            parameterType="com.dev.market.product.model.dto.ProductDeleteRequestDTO">
+        /* 상품 상세 삭제 */
+        DELETE
+        FROM market.TB_PD_DETAIL
+        WHERE PD_NO = #{pdNo}
+    </delete>
+
+    <delete id="deleteProductCategoryInfo"
+            parameterType="com.dev.market.product.model.dto.ProductDeleteRequestDTO">
+        /* 상품 카테고리 삭제 */
+        DELETE
+        FROM market.TB_PD_CT_SELECT
+        WHERE PD_NO = #{pdNo}
+    </delete>
+
+    <select id="selectProductKeywordInfoList"
+            resultType="com.dev.market.product.model.vo.ProductKeywordInfoVO">
+        /*
+          상품 키워드 검색 조회
+         */
+        SELECT PD_NO   AS pdNo
+             , KEYWORD AS pdKeyword
+             , REG_DT  AS regDt
+        FROM market.tb_searching_word;
+    </select>
+    <select id="selectProductKeywordInfo"
+            parameterType="com.dev.market.product.model.dto.ProductKeywordSelectRequestDTO"
+            resultType="com.dev.market.product.model.vo.ProductKeywordInfoVO">
+        /*  상품 키워드 검색 조회 */
+        SELECT PD_NO   AS pdNo
+             , KEYWORD AS pdKeyword
+             , REG_DT  AS regDt
+        FROM market.TB_SEARCHING_WORD
+        WHERE KEYWORD LIKE CONCAT('%', #{pdKeyword}, '%')
+        LIMIT 1
+    </select>
+    <insert id="insertProductKeywordInfo"
+            parameterType="com.dev.market.product.model.dto.ProductKeywordInsertRequestDTO">
+        /*  상품 키워드 삽입 */
+        INSERT INTO market.tb_searching_word(pd_no, keyword)
+            VALUE (#{pdNo}, #{pdKeyword})
+    </insert>
+    <delete id="deleteProductKeywordInfo"
+            parameterType="com.dev.market.product.model.dto.ProductKeywordDeleteRequestDTO">
+        /* 상품 키워드 삭제 */
+        DELETE
+        FROM market.tb_searching_word
+        WHERE KEYWORD_NO = #{pdKeyword}
+    </delete>
+
+    <select id="selectProductViewInfoList"
+            resultType="com.dev.market.product.model.vo.ProductViewInfoVO">
+        /* 상품 조회수 리스트 조회 */
+        SELECT
+            VIEW_NO AS viewNo
+             , PD_NO AS pdNo
+             , COUNT(*) AS pdViewCnt
+             , REG_DT AS regDt
+        FROM market.TB_PD_VIEW
+        GROUP BY PD_NO
+    </select>
+</mapper>

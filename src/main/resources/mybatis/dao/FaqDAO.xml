@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dev.market.faq.model.dao.FaqDAO">
+    <select id="selectFaqInfoList"
+            resultType="com.dev.market.faq.model.vo.FaqInfoVO">
+
+        /*
+            FAQ 관련된 모든 리스트
+        */
+        SELECT
+             FAQ_NO AS faqNo
+             ,TITLE AS faqTitle
+             , CONTENT AS faqContent
+             , OPEN_YN AS openYNEnum
+             , REG_DT AS regDt
+        FROM market.TB_FAQ
+    </select>
+
+    <select id="selectFaqInfo"
+            parameterType="com.dev.market.faq.model.dto.FaqSelectRequestDTO"
+            resultType="com.dev.market.faq.model.vo.FaqInfoVO">
+        /*
+            FAQ 관련된 특정 리스트
+        */
+        SELECT
+            FAQ_NO AS faqNo
+             ,TITLE AS faqTitle
+             , CONTENT AS faqContent
+             , OPEN_YN AS openYNEnum
+             , REG_DT AS regDt
+        FROM market.TB_FAQ
+        WHERE FAQ_NO = #{faqNo}
+    </select>
+
+    <insert id="insertFaqInfo"
+            parameterType="com.dev.market.faq.model.dto.FaqInsertRequestDTO">
+        /*
+            FAQ 정보 삽입
+        */
+
+        INSERT INTO market.TB_FAQ(TITLE, CONTENT, OPEN_YN)
+            VALUE (#{faqTitle}, #{faqContent}, #{openYNEnum})
+    </insert>
+
+    <update id="updateFaqInfo"
+            parameterType="com.dev.market.faq.model.dto.FaqUpdateRequestDTO">
+        /*
+            FAQ 정보 수정
+        */
+        UPDATE market.TB_FAQ
+        SET TITLE = #{faqTitle}
+          , CONTENT = #{faqContent}
+          , MOD_DT = NOW()
+        WHERE FAQ_NO = #{faqNo}
+    </update>
+
+    <update id="updateFaqState"
+            parameterType="com.dev.market.faq.model.dto.FaqUpdateStateRequestDTO">
+        /*
+            FAQ 상태 수정
+        */
+        UPDATE market.TB_FAQ
+        SET OPEN_YN = #{openYNEnum}
+          , MOD_DT = NOW()
+        WHERE FAQ_NO = #{faqNo}
+    </update>
+</mapper>

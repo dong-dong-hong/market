@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dev.market.category.model.dao.CategoryDAO">
+    <select id="selectTopCategoryInfoList"
+            resultType="com.dev.market.category.model.vo.TopCategoryInfoVO">
+        /*
+          상위 카테고리 관련된 모든 리스트 조회
+        */
+        SELECT PD_CT1_NO AS pdCt1No
+             ,NAME AS ctName
+             ,USE_YN AS useYNEnum
+             ,REG_DT AS regDt
+        FROM market.TB_PD_CT_DEPTH1
+    </select>
+
+    <select id="selectTopCategoryInfo"
+            parameterType="com.dev.market.category.model.dto.TopCategorySelectRequestDTO"
+            resultType="com.dev.market.category.model.vo.TopCategoryInfoVO">
+        /*
+          특정 상위 카테고리 정보 조회
+        */
+        SELECT PD_CT1_NO AS pdCt1No
+             ,NAME AS ctName
+             ,USE_YN AS useYNEnum
+             ,REG_DT AS regDt
+        FROM market.TB_PD_CT_DEPTH1
+        WHERE PD_CT1_NO = #{pdCt1No}
+    </select>
+
+    <insert id="insertTopCategoryInfo"
+            parameterType="com.dev.market.category.model.dto.TopCategoryInsertRequestDTO">
+        /*
+          특정 상위 카테고리 정보 삽입
+        */
+
+        INSERT INTO market.TB_PD_CT_DEPTH1(NAME)
+        VALUE(#{pdCt1Name})
+    </insert>
+
+    <update id="updateTopCategoryInfo"
+            parameterType="com.dev.market.category.model.dto.TopCategoryUpdateRequestDTO">
+        /*
+          특정 상위 카테고리 정보 수정
+        */
+
+        UPDATE market.TB_PD_CT_DEPTH1
+        SET NAME = #{ctName}
+        WHERE PD_CT1_NO = #{pdCt1No}
+    </update>
+
+    <update id="updateTopCategoryState"
+            parameterType="com.dev.market.category.model.dto.TopCategoryUpdateStateRequestDTO">
+        /*
+          특정 상위 카테고리 상태 수정
+        */
+
+        UPDATE market.TB_PD_CT_DEPTH1
+        SET USE_YN = #{useYNEnum}
+        WHERE PD_CT1_NO = #{pdCt1No}
+    </update>
+
+    <select id="selectBottomCategoryInfoList"
+            resultType="com.dev.market.category.model.vo.BottomCategoryInfoVO">
+        /*
+          하위 카테고리 관련된 모든 리스트 조회
+        */
+        SELECT PD_CT2_NO AS pdCt2No
+             ,NAME AS ctName
+             ,USE_YN AS useYNEnum
+             ,REG_DT AS regDt
+        FROM market.TB_PD_CT_DEPTH2
+    </select>
+
+    <select id="selectBottomCategoryInfo"
+            parameterType="com.dev.market.category.model.dto.BottomCategorySelectRequestDTO"
+            resultType="com.dev.market.category.model.vo.BottomCategoryInfoVO">
+        /*
+          특정 하위 카테고리 정보 조회
+        */
+        SELECT PD_CT2_NO AS pdCt2No
+             ,NAME AS ctName
+             ,USE_YN AS useYNEnum
+             ,REG_DT AS regDt
+        FROM market.TB_PD_CT_DEPTH2
+        WHERE PD_CT2_NO = #{pdCt2No}
+    </select>
+
+    <insert id="insertBottomCategoryInfo"
+            parameterType="com.dev.market.category.model.dto.BottomCategoryInsertRequestDTO">
+        /*
+          특정 하위 카테고리 정보 삽입
+        */
+
+        INSERT INTO market.TB_PD_CT_DEPTH2(PD_CT1_NO, NAME)
+        VALUE(#{pdCt1No}, #{ctName})
+    </insert>
+
+    <update id="updateBottomCategoryInfo"
+            parameterType="com.dev.market.category.model.dto.BottomCategoryUpdateRequestDTO">
+        /*
+          특정 하위 카테고리 정보 수정
+        */
+
+        UPDATE market.TB_PD_CT_DEPTH2
+        SET NAME = #{ctName}
+        WHERE PD_CT2_NO = #{pdCt2No}
+    </update>
+
+    <update id="updateBottomCategoryState"
+            parameterType="com.dev.market.category.model.dto.BottomCategoryUpdateStateRequestDTO">
+        /*
+          특정 하위 카테고리 상태 수정
+        */
+
+        UPDATE market.TB_PD_CT_DEPTH2
+        SET USE_YN = #{useYNEnum}
+        WHERE PD_CT2_NO = #{pdCt2No}
+    </update>
+</mapper>
